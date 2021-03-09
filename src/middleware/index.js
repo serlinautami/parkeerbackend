@@ -21,6 +21,8 @@ const authMiddleware = function(req, res, next) {
     })
   }
 
+  req.accessToken = bearer;
+
   // passed
   next();
 }

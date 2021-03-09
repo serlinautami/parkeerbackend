@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const { User } = require('../model');
+const { generateRandomToken } = require('../helper');
 
 /**
  * @name login
@@ -38,12 +39,15 @@ const login = async function(req, res) {
       }); 
     }
 
+    const accessToken = await generateRandomToken();
+
+    // update token ke database
+    User.updateAccessToken(userData.id, accessToken)
+
     return res.status(200).json({
       status: 1,
       message: 'sukses',
-      data: {
-        accessToken: getUserData.accessToken
-      }
+      data: { accessToken }
     });
   } catch (err) {
     console.log('err', err);
@@ -61,6 +65,7 @@ const login = async function(req, res) {
 const registration = async function(req, res) {
   const { name, email, password }  = req.body;
 
+  // validasi kolom tidak diisi
   if(!name || !email || !password) {
     return res.status(400).json({
       status: 0,
@@ -68,6 +73,7 @@ const registration = async function(req, res) {
     })
   }
 
+  // validasi password harus minimal 8 karakter
   if(password && password.length < 8) {
     return res.status(400).json({
       status: 0,
@@ -76,8 +82,8 @@ const registration = async function(req, res) {
   }
 
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
     
+    // cek user sudah ada sebelumnya yang terdaftar
     const existUser = await User.findByEmail(email);
 
     if(existUser) {
@@ -87,6 +93,10 @@ const registration = async function(req, res) {
       });
     }
 
+    // hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // membuat data user dan simpan ke database
     await User.create({ 
       name, 
       email,
