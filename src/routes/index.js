@@ -5,7 +5,7 @@ const { appConfig } = require('../configs');
 
 
 // index
-router.get('/', (req, res) => res.status(200).json({
+router.get('/', (_req, res) => res.status(200).json({
   status: 1,
   message: 'Success'
 }))

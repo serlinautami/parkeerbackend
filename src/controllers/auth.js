@@ -61,7 +61,7 @@ const login = async function(req, res) {
 const registration = async function(req, res) {
   const { name, email, password }  = req.body;
 
-  if(!name || !email || password) {
+  if(!name || !email || !password) {
     return res.status(400).json({
       status: 0,
       message: 'kolom, nama, email, dan password harus diisi!'
