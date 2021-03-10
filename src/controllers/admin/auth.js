@@ -1,12 +1,13 @@
 const bcrypt = require('bcrypt');
-const { User } = require('../model');
-const { generateRandomToken } = require('../helper');
+const { User } = require('../../model');
+const { generateRandomToken } = require('../../helper');
 
 /**
  * @name login
  * @description controller untuk login
  */
 const login = async function(req, res) {
+  console.log('req.body', req.body)
 
   const { email, password } = req.body
 
@@ -26,6 +27,13 @@ const login = async function(req, res) {
         status: 0,
         message: 'akun tidak ditemukan'
       }); 
+    }
+
+    if(userData.role !== 'admin') {
+      return res.status(403).json({
+        status: 0,
+        message: 'Akses ditolak'
+      });
     }
 
     // untuk menyocokan password yang di input dengan yang ada di database

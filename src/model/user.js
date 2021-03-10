@@ -113,7 +113,7 @@ const updateAccessToken = function(userId, token) {
 const findByAccessToken = function(token) {
   const promise = new Promise(function(resolve, reject) {
     database.query(`
-      SELECT id, name, email, createdAt, updatedAt FROM ${tableName} WHERE accessToken = '${token}'`,
+      SELECT id, name, email, createdAt, updatedAt, role FROM ${tableName} WHERE accessToken = '${token}'`,
       function(err, rows, field){
         if(err) {
           return reject(err);

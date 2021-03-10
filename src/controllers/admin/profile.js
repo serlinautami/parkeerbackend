@@ -1,4 +1,4 @@
-const { User } = require('../model');
+const { User } = require('../../model');
 
 const get = async function(req, res) {
   const accessToken = req.accessToken;
