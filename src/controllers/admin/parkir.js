@@ -1,12 +1,12 @@
-const { JenisParkir, User } = require('../../model');
+const { JenisParkir, User, TarifParkir } = require('../../model');
 
 const createJenisParkir = async function (req, res) {
-  const { name } = req.body;
+  const { name, biaya } = req.body;
 
-  if(!name) {
+  if(!name || !biaya) {
     return res.status(400).json({
       status: 0,
-      message: 'kolom nama harus diisi'
+      message: 'kolom nama dan biaya harus diisi'
     })
   }
 
@@ -20,7 +20,7 @@ const createJenisParkir = async function (req, res) {
       })
     }
 
-    await JenisParkir.create({ name })
+    await JenisParkir.create({ name, biaya })
     return res.status(201).json({
       status: 0,
       message: 'item berhasil ditambahkan!'

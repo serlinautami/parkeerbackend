@@ -9,12 +9,12 @@ const tableName = 'jenis_parkir';
  * @description untuk membuat data jenis parker dan simpan database
  * @param {*} param0 
  */
-const create = function({ name }) {
+const create = function({ name, biaya }) {
   const promise = new Promise(function(resolve, reject) {
     const id = generateRandomId();
     database.query(`
-      INSERT INTO ${tableName} (id, name, active) 
-      VALUES ('${id}', '${name}', '1')
+      INSERT INTO ${tableName} (id, name, biaya, active) 
+      VALUES ('${id}', '${name}', '${biaya}', '1')
     `, function (err, rows, field) {
         if(err) {
           return reject(err);
@@ -69,8 +69,29 @@ const get = function () {
   return promise;
 }
 
+
+const findById = function (id) {
+  const promise = new Promise (function(resolve, reject) {
+    database.query(`SELECT * FROM ${tableName} WHERE id = '${id}'`, function (err, rows, field) {
+      if(err) {
+        return reject(err);
+      }
+
+      console.log('rows', rows);
+      console.log('field', rows);
+      if(!rows || rows.length === 0) {
+        return resolve(null);
+      }
+      return resolve(rows[0]);
+    })
+  });
+
+  return promise;
+}
+
 module.exports = {
   get,
   create,
+  findById,
   findByName
 }
