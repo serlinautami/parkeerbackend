@@ -130,7 +130,25 @@ const findByAccessToken = function(token) {
   return promise;
 }
 
+
+const get = function(token) {
+  const promise = new Promise(function(resolve, reject) {
+    database.query(`
+      SELECT id, name, email, createdAt, updatedAt, role FROM ${tableName}`,
+      function(err, rows, field){
+        if(err) {
+          return reject(err);
+        }
+        console.log('field', field);
+        console.log('rows', rows);
+        return resolve(rows)
+      })
+  });
+  return promise;
+}
+
 module.exports = {
+  get,
   create,
   findById,
   findByEmail,

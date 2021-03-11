@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const { authController, profileController, parkirControlller } = require('../controllers/admin');
+const { authController, profileController, parkirControlller, userController } = require('../controllers/admin');
 const { adminAuthMiddleware } = require('../middleware');
 
 // admin route
@@ -11,6 +11,9 @@ router.get('/api/admin/jenis-parkir', adminAuthMiddleware, parkirControlller.get
 router.post('/api/admin/jenis-parkir', adminAuthMiddleware, parkirControlller.createJenisParkir);
 router.put('/api/admin/jenis-parkir/:id', adminAuthMiddleware, parkirControlller.updateJenisParkir);
 router.delete('/api/admin/jenis-parkir/:id', adminAuthMiddleware, parkirControlller.deleteJenisParkir);
+
+// user
+router.get('/api/admin/customer', adminAuthMiddleware, userController.get);
 
 
 module.exports = router;
