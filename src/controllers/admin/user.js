@@ -2,7 +2,7 @@ const { User } = require('../../model');
 
 const get = async function(req, res) {
   try {
-    const data = await User.get();
+    const data = await User.get({ role: 'customer' });
     
     return res.status(200).json({
       status: 1,

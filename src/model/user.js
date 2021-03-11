@@ -131,10 +131,11 @@ const findByAccessToken = function(token) {
 }
 
 
-const get = function(token) {
+const get = function(params) {
   const promise = new Promise(function(resolve, reject) {
+
     database.query(`
-      SELECT id, name, email, createdAt, updatedAt, role FROM ${tableName}`,
+      SELECT id, name, email, createdAt, updatedAt, role FROM ${tableName} ${params ? 'WHERE' : ''} ${params?.role ? `role = '${params.role}'`: ''}`,
       function(err, rows, field){
         if(err) {
           return reject(err);
