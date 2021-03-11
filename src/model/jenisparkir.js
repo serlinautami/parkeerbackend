@@ -28,6 +28,45 @@ const create = function({ name, biaya }) {
   return promise;
 }
 
+
+const update = function({ id, name, biaya }) {
+  const promise = new Promise(function(resolve, reject) {
+    database.query(`
+      UPDATE ${tableName} 
+      SET name = '${name}', biaya = '${biaya}'
+      WHERE id = '${id}'
+    `, function (err, rows, field) {
+        if(err) {
+          return reject(err);
+        }
+        console.log('rows', rows);
+        console.log('field', rows);
+        return resolve(rows);
+    })
+  })
+
+  return promise;
+}
+
+const remove = function(id) {
+  const promise = new Promise(function(resolve, reject) {
+    database.query(`
+      UPDATE ${tableName} 
+      SET deleted = '1'
+      WHERE id = '${id}'
+    `, function (err, rows, field) {
+        if(err) {
+          return reject(err);
+        }
+        console.log('rows', rows);
+        console.log('field', rows);
+        return resolve(rows);
+    })
+  })
+
+  return promise;
+}
+
 /**
  * @name findByName
  * @description query menccari jenis parkir berdasarkan nama
@@ -36,7 +75,7 @@ const create = function({ name, biaya }) {
 const findByName = function(name) {
   const promise = new Promise(function(resolve, reject) {
     database.query(`
-      SELECT * FROM ${tableName} WHERE name = '${name}'
+      SELECT * FROM ${tableName} WHERE name = '${name}' AND deleted = '0'
     `, function(err, rows, field) {
       if(err) {
         return reject(err);
@@ -53,9 +92,9 @@ const findByName = function(name) {
   return promise
 }
 
-const get = function () {
+const get = function (isDeleted) {
   const promise = new Promise (function(resolve, reject) {
-    database.query(`SELECT * FROM ${tableName}`, function (err, rows, field) {
+    database.query(`SELECT * FROM ${tableName} WHERE deleted = '${isDeleted ? 1 : 0}'`, function (err, rows, field) {
       if(err) {
         return reject(err);
       }
@@ -92,6 +131,8 @@ const findById = function (id) {
 module.exports = {
   get,
   create,
+  update,
+  remove,
   findById,
   findByName
 }
