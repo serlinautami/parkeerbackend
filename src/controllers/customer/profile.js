@@ -4,7 +4,9 @@ const get = async function(req, res) {
   const accessToken = req.accessToken;
 
   try {
-    const user = await User.findByAccessToken(accessToken);
+    const user = await User.findOne({ where: {
+      access_token: accessToken
+    } });
     if(!user) {
       return res.status(404).json({
         status: 0,

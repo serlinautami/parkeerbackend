@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const { User } = require('../../model');
-const { generateRandomToken } = require('../../helper');
-
+const { appConfig } = require('../../configs');
 /**
  * @name login
  * @description controller untuk login
@@ -19,7 +19,7 @@ const login = async function(req, res) {
   }
   
   try {
-    const userData = await User.findByEmail(email);
+    const userData = await User.findOne({ where: { email, deleted: 0, role: 'customer' } });
 
     if(!userData) {
       return res.status(404).json({
@@ -28,11 +28,11 @@ const login = async function(req, res) {
       }); 
     }
 
-    if(userData.role !== 'customer') {
-      return res.status(403).json({
+    if(userData.active === 0) {
+      return res.status(400).json({
         status: 0,
-        message: 'Akses ditolak'
-      });
+        message: 'akun kamu dinonaktifkan, silahkan hubungi admin!'
+      }); 
     }
 
     // untuk menyocokan password yang di input dengan yang ada di database
@@ -46,15 +46,25 @@ const login = async function(req, res) {
       }); 
     }
 
-    const accessToken = await generateRandomToken();
 
-    // update token ke database
-    User.updateAccessToken(userData.id, accessToken)
+    // encrypt dengan JWT
+    const accessToken = jwt.sign({
+      id: userData.id,
+      name: userData.name,
+      email: userData.email,
+      photo: userData.photo,
+      dob: userData.dob,
+      role: userData.role
+    }, appConfig.passphase, { expiresIn: 60 * 60 * 12 });
+
+    await userData.update({
+      access_token: accessToken
+    })
 
     return res.status(200).json({
       status: 1,
       message: 'sukses',
-      data: { accessToken }
+      data: { access_token: accessToken }
     });
   } catch (err) {
     console.log('err', err);
@@ -91,7 +101,7 @@ const registration = async function(req, res) {
   try {
     
     // cek user sudah ada sebelumnya yang terdaftar
-    const existUser = await User.findByEmail(email);
+    const existUser = await User.findOne({ where: { email, deleted: 0, role: 'customer' } });
 
     if(existUser) {
       return res.status(400).json({
@@ -112,13 +122,11 @@ const registration = async function(req, res) {
     
     return res.status(200).json({
       status: 1,
-      code: 201,
       message: 'registrasi berhasil'
     });
   } catch (err) {
     res.status(500).json({
       status: 0,
-      code: 500,
       message: 'Server Error'
     });
   }

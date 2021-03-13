@@ -2,9 +2,13 @@ const { User } = require('../../model');
 
 const get = async function(req, res) {
   const accessToken = req.accessToken;
-
   try {
-    const user = await User.findByAccessToken(accessToken);
+    const user = await User.findOne({ 
+      where: { access_token: accessToken, deleted: 0, active: 1 },
+      attributes: {
+        exclude: ['password','access_token', 'deleted', 'active']
+      }
+    });
     if(!user) {
       return res.status(404).json({
         status: 0,

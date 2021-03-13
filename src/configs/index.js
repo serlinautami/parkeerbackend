@@ -2,7 +2,8 @@ module.exports = {
   appConfig: {
     appName: 'Parkeer Server',
     port: 8000,
-    adminDefaultPassword: '12345678'
+    adminDefaultPassword: '12345678',
+    passphase: 'parkeer123'
   },
   databaseConfig: {
     dialect: 'mysql',

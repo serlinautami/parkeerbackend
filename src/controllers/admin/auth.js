@@ -1,13 +1,13 @@
 const bcrypt = require('bcrypt');
 const { User } = require('../../model');
-const { generateRandomToken } = require('../../helper');
+const jwt = require('jsonwebtoken');
+const { appConfig } = require('../../configs');
 
 /**
  * @name login
  * @description controller untuk login
  */
 const login = async function(req, res) {
-  console.log('req.body', req.body)
 
   const { email, password } = req.body
 
@@ -21,10 +21,8 @@ const login = async function(req, res) {
   
   try {
     const userData = await User.findOne({
-      where: { email }
+      where: { email, deleted: 0 }
     })
-
-    console.log('userData', userData)
 
     if(!userData) {
       return res.status(404).json({
@@ -51,19 +49,27 @@ const login = async function(req, res) {
       }); 
     }
 
-    const accessToken = await generateRandomToken();
+    // encrypt dengan JWT
+    const accessToken = jwt.sign({
+      id: userData.id,
+      name: userData.name,
+      email: userData.email,
+      photo: userData.photo,
+      dob: userData.dob,
+      role: userData.role
+    }, appConfig.passphase, { expiresIn: 60 * 60 * 12 });
+
+    await userData.update({
+      access_token: accessToken
+    })
 
     // update token ke database
-    User.update({ access_token: accessToken }, {
-      where: {
-        id: userData.id 
-      }
-    })
+    await userData.update({ access_token: accessToken });
 
     return res.status(200).json({
       status: 1,
       message: 'sukses',
-      data: { accessToken }
+      data: { access_token: accessToken }
     });
   } catch (err) {
     console.log('err', err);
