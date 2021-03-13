@@ -1,0 +1,1 @@
+const { ParkingType }  = require('../../model');

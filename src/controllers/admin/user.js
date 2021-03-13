@@ -100,14 +100,16 @@ const removeMemberAdmin = async function (req, res) {
   try {
     const { id } = req.params;
 
-    await User.update({ 
-      deleted: 1 
-    }, {
-      where: {
-        id,
-        role: 'admin'
-      }
-    });
+    const data = await User.findOne({ where: { id, role: 'admin', deleted: 0 } })
+
+    if(!data) {
+      return res.status(404).json({
+        status: 0,
+        message: 'akun tidak ditemukan'
+      })
+    }
+
+    await data.update({ deleted: 1 });
 
     return res.status(200).json({
       status: 1,

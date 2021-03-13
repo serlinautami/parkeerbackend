@@ -1,5 +1,10 @@
 const router = require('express').Router()
-const { authController, profileController, parkirControlller, userController } = require('../controllers/admin');
+const { 
+  authController, 
+  profileController, 
+  vehicleTypeController, 
+  userController 
+} = require('../controllers/admin');
 const { adminAuthMiddleware, superAdminAuthMiddleware } = require('../middleware');
 
 // admin route
@@ -20,6 +25,14 @@ router.get('/api/admin/member-admin', adminAuthMiddleware, userController.getMem
 router.post('/api/admin/member-admin', adminAuthMiddleware, userController.createMemberAdmin);
 router.put('/api/admin/member-admin/:id/reset-password', superAdminAuthMiddleware, userController.resetPassword);
 router.delete('/api/admin/member-admin/:id', superAdminAuthMiddleware, userController.removeMemberAdmin);
+
+
+// jenis kendaraan
+router.get('/api/admin/vehicle-type', adminAuthMiddleware, vehicleTypeController.get);
+router.post('/api/admin/vehicle-type', adminAuthMiddleware, vehicleTypeController.create);
+router.put('/api/admin/vehicle-type/:id', adminAuthMiddleware, vehicleTypeController.update);
+router.delete('/api/admin/vehicle-type/:id', adminAuthMiddleware, vehicleTypeController.remove);
+
 
 
 
