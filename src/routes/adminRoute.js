@@ -2,7 +2,8 @@ const router = require('express').Router()
 const { 
   authController, 
   profileController, 
-  vehicleTypeController, 
+  vehicleTypeController,
+  parkingTypeController,
   userController 
 } = require('../controllers/admin');
 const { adminAuthMiddleware, superAdminAuthMiddleware } = require('../middleware');
@@ -33,6 +34,11 @@ router.post('/api/admin/vehicle-type', adminAuthMiddleware, vehicleTypeControlle
 router.put('/api/admin/vehicle-type/:id', adminAuthMiddleware, vehicleTypeController.update);
 router.delete('/api/admin/vehicle-type/:id', adminAuthMiddleware, vehicleTypeController.remove);
 
+// jenis parkir
+router.get('/api/admin/parking-type', adminAuthMiddleware, parkingTypeController.get);
+router.post('/api/admin/parking-type', adminAuthMiddleware, parkingTypeController.create);
+router.put('/api/admin/parking-type/:id', adminAuthMiddleware, parkingTypeController.update);
+router.delete('/api/admin/parking-type/:id', adminAuthMiddleware, parkingTypeController.remove);
 
 
 
