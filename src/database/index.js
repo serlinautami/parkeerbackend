@@ -1,13 +1,12 @@
-const mysql = require('mysql');
-const configs = require('../configs');
+const { databaseConfig } = require('../configs');
+const { Sequelize } = require('sequelize');
 
 // setup koneksi database
-const connection = mysql.createConnection({
-  host: configs.databaseConfig.host,
-  user: configs.databaseConfig.user,
-  password: configs.databaseConfig.password,
-  database: configs.databaseConfig.database,
-  port: configs.databaseConfig.port
+const database = new Sequelize(databaseConfig.database, databaseConfig.user, databaseConfig.password,{
+  host: databaseConfig.host,
+  dialect: databaseConfig.dialect,
+  port: databaseConfig.port
 })
 
-module.exports = connection;
+
+module.exports = database;

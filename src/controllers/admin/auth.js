@@ -20,7 +20,11 @@ const login = async function(req, res) {
   }
   
   try {
-    const userData = await User.findByEmail(email);
+    const userData = await User.findOne({
+      where: { email }
+    })
+
+    console.log('userData', userData)
 
     if(!userData) {
       return res.status(404).json({
@@ -29,7 +33,7 @@ const login = async function(req, res) {
       }); 
     }
 
-    if(userData.role !== 'admin') {
+    if(userData.role !== 'admin' && userData.role !== 'super-admin') {
       return res.status(403).json({
         status: 0,
         message: 'Akses ditolak'
@@ -50,7 +54,11 @@ const login = async function(req, res) {
     const accessToken = await generateRandomToken();
 
     // update token ke database
-    User.updateAccessToken(userData.id, accessToken)
+    User.update({ access_token: accessToken }, {
+      where: {
+        id: userData.id 
+      }
+    })
 
     return res.status(200).json({
       status: 1,
@@ -66,66 +74,6 @@ const login = async function(req, res) {
   }
 }
 
-/**
- * @name registration
- * @description controller untuk registrasi
- */
-const registration = async function(req, res) {
-  const { name, email, password }  = req.body;
-
-  // validasi kolom tidak diisi
-  if(!name || !email || !password) {
-    return res.status(400).json({
-      status: 0,
-      message: 'kolom, nama, email, dan password harus diisi!'
-    })
-  }
-
-  // validasi password harus minimal 8 karakter
-  if(password && password.length < 8) {
-    return res.status(400).json({
-      status: 0,
-      message: 'panjang password minimal 8 karakter'
-    })
-  }
-
-  try {
-    
-    // cek user sudah ada sebelumnya yang terdaftar
-    const existUser = await User.findByEmail(email);
-
-    if(existUser) {
-      return res.status(400).json({
-        status: 0,
-        message: 'akun dengan email ini sudah terdaftar'
-      });
-    }
-
-    // hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // membuat data user dan simpan ke database
-    await User.create({ 
-      name, 
-      email,
-      password: hashedPassword 
-    });
-    
-    return res.status(200).json({
-      status: 1,
-      code: 201,
-      message: 'registrasi berhasil'
-    });
-  } catch (err) {
-    res.status(500).json({
-      status: 0,
-      code: 500,
-      message: 'Server Error'
-    });
-  }
-}
-
 module.exports = {
-  login,
-  registration
+  login
 }

@@ -74,7 +74,7 @@ const adminAuthMiddleware = async function(req, res, next) {
 
   try {
     const userData = await User.findByAccessToken(bearer);
-    if(!userData || userData.role !== 'admin') {
+    if(!userData || userData.role !== 'admin' && userData.role !== 'super-admin') {
       return res.status(500).json({
         status: 0,
         message: 'Akses ditolak!'
