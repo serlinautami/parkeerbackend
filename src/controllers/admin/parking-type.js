@@ -1,4 +1,4 @@
-const { ParkingType }  = require('../../model');
+const { ParkingType, ParkingVehicleList, VehicleType }  = require('../../model');
 
 /**
  * @name get
@@ -8,7 +8,11 @@ const get = async function (req, res){
   try {
     const data = await ParkingType.findAll({
       where: {
-        deleted: 0
+        deleted: 0,
+      },
+      include: {
+        model: ParkingVehicleList,
+        include: VehicleType
       }
     })
 
@@ -32,7 +36,7 @@ const get = async function (req, res){
  */
 const create = async function (req, res){
   try {
-    const { name, fee } = req.body;
+    const { name, fee, vehicle_list } = req.body;
 
     if(!name || !fee) {
       return res.status(400).json({
@@ -55,10 +59,18 @@ const create = async function (req, res){
       })
     }
 
-    await ParkingType.create({
+    const data =  await ParkingType.create({
       name,
       fee
     });
+
+    if(data) {
+      if(vehicle_list && typeof vehicle_list === 'object' && vehicle_list.length > 0) {
+        const dbPayload =  vehicle_list.map(itemId => ({ vehicle_type_id:  itemId, parking_type_id: data.id }))
+
+        ParkingVehicleList.bulkCreate(dbPayload)
+      }
+    }
 
     return res.status(201).json({
       status: 1,
@@ -81,7 +93,7 @@ const create = async function (req, res){
 const update = async function (req, res){
   try {
     const { id } = req.params;
-    const { name, fee, active } = req.body;
+    const { name, fee, active, vehicle_list } = req.body;
 
     if(!name || !fee) {
       return res.status(400).json({
@@ -104,7 +116,7 @@ const update = async function (req, res){
       })
     }
 
-    const existName = ParkingType.findOne({
+    const existName = await ParkingType.findOne({
       where: {
         name,
         deleted: 0
@@ -124,6 +136,15 @@ const update = async function (req, res){
       fee,
       active
     })
+
+
+    if(data) {
+      if(vehicle_list && typeof vehicle_list === 'object' && vehicle_list.length > 0) {
+        await ParkingVehicleList.destroy({ where: { parking_type_id: data.id } });
+        const dbPayload =  vehicle_list.map(itemId => ({ vehicle_type_id:  itemId, parking_type_id: data.id }))
+        ParkingVehicleList.bulkCreate(dbPayload)
+      }
+    }
 
     return res.status(200).json({
       status: 1,
@@ -162,6 +183,13 @@ const remove = async function (req, res){
 
     await data.update({
       deleted: 1
+    })
+
+
+    ParkingVehicleList.destroy({
+      where: {
+        parking_type_id: data.id
+      }
     })
 
     return res.status(200).json({

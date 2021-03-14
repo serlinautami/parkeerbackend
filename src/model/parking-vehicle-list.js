@@ -9,4 +9,6 @@ const ParkingVehicleList = database.define('parking_vehicle_lists', {
   timestamps: false,
 })
 
+
+
 module.exports = ParkingVehicleList;

@@ -22,7 +22,7 @@ database
   .then(() => console.log('Connection has been established successfully.'))
   .catch(error => console.error('Unable to connect to the database:', error))
 
-database.sync();
+// database.sync({ force: true });
 
 // jalankan aplikasi
 app.listen(configs.appConfig.port, () => {

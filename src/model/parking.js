@@ -11,6 +11,7 @@ const Parking = database.define('parkings', {
   parking_out: { type: DataTypes.DATE, allowNull: true },
   parking_fee: { type: DataTypes.INTEGER, allowNull: true },
   deleted: { type: DataTypes.BOOLEAN, allowNull: true, defaultValue: 0 },
+  status: { type: DataTypes.TINYINT, allowNull: true, defaultValue: 1 }
 }, {
   timestamps: true,
   createdAt: 'created_at',
